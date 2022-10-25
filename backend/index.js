@@ -16,7 +16,7 @@ const BearerToken = process.env.BEARER_TOKEN;
 
 
 //Get Tweets from Twitter API
-const getUserId = async (username) => {
+const getUserData = async (username) => {
     const endpointUrl = `https://api.twitter.com/2/users/by/username/${username}`
     const response = await needle('get', endpointUrl, {}, {
         headers: {
@@ -33,15 +33,218 @@ const getUserId = async (username) => {
         }
     }
     if (response.body)
-        return response.body.data.id;
+        return response.body.data;
     else
         throw new Error("Unsuccessful Request");
 }
 
-getUserId("mwseibel").then((userId) => {
-    console.log(userId)
-})
+//Get Tweets from Twitter API
+const getUserTweets = async (userId, num = 100) => {
+    if (num > 100) {
+        throw new Error('Can load maximum of 100 tweets in one pull')
+    }
+    const endpointUrl = `https://api.twitter.com/2/users/${userId}/tweets`
+    const params = {
+        'max_results': num
+    }
+    const response = await needle('get', endpointUrl, params, {
+        headers: {
+            "User-Agent": "v2RecentSearchJS",
+            "authorization": `Bearer ${BearerToken}`
+        }
+    })
+    if (response.statusCode !== 200) {
+        if (response.statusCode === 403) {
+            res.status(403).send(response.body);
+        }
+        else {
+            throw new Error(response.body.error.message);
+        }
+    }
+    if (response.body)
+        return response.body.data;
+    else
+        throw new Error("Unsuccessful Request");
+}
 
+const getUserFollowers = async (userId, num) => {
+    if (num > 1000) {
+        throw new Error('Can load maximum of 100 followers in one pull')
+    }
+    const endpointUrl = `https://api.twitter.com/2/users/${userId}/followers`
+    const params = {
+        'max_results': num
+    }
+    const response = await needle('get', endpointUrl, params, {
+        headers: {
+            "User-Agent": "v2RecentSearchJS",
+            "authorization": `Bearer ${BearerToken}`
+        }
+    })
+    if (response.statusCode !== 200) {
+        if (response.statusCode === 403) {
+            res.status(403).send(response.body);
+        }
+        else {
+            throw new Error(response.body.error.message);
+        }
+    }
+    if (response.body)
+        return response.body.data;
+    else
+        throw new Error("Unsuccessful Request");
+}
+
+const getUserFollowing = async (userId, num) => {
+    if (num > 1000) {
+        throw new Error('Can load maximum of 100 followers in one pull')
+    }
+    const endpointUrl = `https://api.twitter.com/2/users/${userId}/following`
+    const params = {
+        'max_results': num
+    }
+    const response = await needle('get', endpointUrl, params, {
+        headers: {
+            "User-Agent": "v2RecentSearchJS",
+            "authorization": `Bearer ${BearerToken}`
+        }
+    })
+    if (response.statusCode !== 200) {
+        if (response.statusCode === 403) {
+            res.status(403).send(response.body);
+        }
+        else {
+            throw new Error(response.body.error.message);
+        }
+    }
+    if (response.body)
+        return response.body.data;
+    else
+        throw new Error("Unsuccessful Request");
+}
+
+const getUserMentions = async (userId, num) => {
+    if (num > 1000) {
+        throw new Error('Can load maximum of 100 followers in one pull')
+    }
+    const endpointUrl = `https://api.twitter.com/2/users/${userId}/mentions`
+    const params = {
+        'max_results': num
+    }
+    const response = await needle('get', endpointUrl, params, {
+        headers: {
+            "User-Agent": "v2RecentSearchJS",
+            "authorization": `Bearer ${BearerToken}`
+        }
+    })
+    if (response.statusCode !== 200) {
+        if (response.statusCode === 403) {
+            res.status(403).send(response.body);
+        }
+        else {
+            throw new Error(response.body.error.message);
+        }
+    }
+    if (response.body)
+        return response.body.data;
+    else
+        throw new Error("Unsuccessful Request");
+}
+
+const getUserLikedTweets = async (userId, num) => {
+    if (num > 1000) {
+        throw new Error('Can load maximum of 100 followers in one pull')
+    }
+    const endpointUrl = `https://api.twitter.com/2/users/${userId}/liked_tweets`
+    const params = {
+        'max_results': num
+    }
+    const response = await needle('get', endpointUrl, params, {
+        headers: {
+            "User-Agent": "v2RecentSearchJS",
+            "authorization": `Bearer ${BearerToken}`
+        }
+    })
+    if (response.statusCode !== 200) {
+        if (response.statusCode === 403) {
+            res.status(403).send(response.body);
+        }
+        else {
+            throw new Error(response.body.error.message);
+        }
+    }
+    if (response.body)
+        return response.body.data;
+    else
+        throw new Error("Unsuccessful Request");
+}
+
+
+const getUsersWhoLikedTweet = async (tweetId, num) => {
+    if (num > 1000) {
+        throw new Error('Can load maximum of 100 followers in one pull')
+    }
+    const endpointUrl = `https://api.twitter.com/2/tweets/${tweetId}/liking_users`
+    const params = {
+        'max_results': num
+    }
+    const response = await needle('get', endpointUrl, params, {
+        headers: {
+            "User-Agent": "v2RecentSearchJS",
+            "authorization": `Bearer ${BearerToken}`
+        }
+    })
+    if (response.statusCode !== 200) {
+        if (response.statusCode === 403) {
+            res.status(403).send(response.body);
+        }
+        else {
+            throw new Error(response.body.error.message);
+        }
+    }
+    if (response.body)
+        return response.body.data;
+    else
+        throw new Error("Unsuccessful Request");
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+async function run() {
+    const { id, name, username } = await getUserData("elonMusk")
+    const tweets = await getUserTweets(id, 5)
+    const followers = await getUserFollowers(id, 5)
+    const following = await getUserFollowing(id, 5)
+
+    const mentions = await getUserMentions(id, 5)
+    const likedTweets = await getUserLikedTweets(id, 5)
+
+    const sampleTweetId = likedTweets[0].id
+    const likedUsers = await getUsersWhoLikedTweet(sampleTweetId, 5)
+
+
+    // console.log(id, name, username)
+    // console.log(tweets)
+    // console.log(followers)
+    // console.log(mentions)
+    // console.log(likedTweets)
+    console.log(likedUsers)
+
+}
+
+run()
 
 
 //You can specify the port in .env file
