@@ -182,7 +182,7 @@ const getUserLikedTweets = async (userId, num) => {
 
 const getUsersWhoLikedTweet = async (tweetId, num) => {
     if (num > 1000) {
-        throw new Error('Can load maximum of 100 followers in one pull')
+        throw new Error('Can load maximum of 100 users in one pull')
     }
     const endpointUrl = `https://api.twitter.com/2/tweets/${tweetId}/liking_users`
     const params = {
