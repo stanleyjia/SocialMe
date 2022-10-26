@@ -4,6 +4,8 @@ const needle = require("needle");
 
 
 const app = express()
+const bodyParser = require('body-parser');
+const cors = require('cors');
 
 
 dotenv.config();
@@ -13,7 +15,11 @@ const BearerToken = process.env.BEARER_TOKEN;
 // console.log(process.env.BEARER_TOKEN)
 
 // const endpointUrl = "https://api.twitter.com/2/tweets/search/recent";
+app.use(cors());
 
+// Configuring body parser middleware
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
 
 //Get Tweets from Twitter API
 const getUserData = async (username) => {
@@ -244,12 +250,20 @@ async function run() {
 
 }
 
-run()
+//run()
+
+app.get('/id/:username', async (req, res) => {
+    const username = req.params.username;
+
+    const { id } = await getUserData(username)
+
+    res.send(id)
+});
 
 
 //You can specify the port in .env file
-// app.listen(process.env.PORT || 3000, () => {
-//     console.log('Currently Listening to the Server')
-// })
+app.listen(process.env.PORT || 3000, () => {
+    console.log('Currently Listening to the Server')
+})
 
 module.exports = app
