@@ -260,6 +260,14 @@ app.get('/id/:username', async (req, res) => {
     res.send(id)
 });
 
+app.get('/tweets/', async (req, res) => {
+    console.log(req.body)
+    const id = req.body.id;
+    const number = req.body.limit;
+    console.log("GET tweets", id, number)
+    res.send(await getUserTweets(id, number))
+});
+
 
 //You can specify the port in .env file
 app.listen(process.env.PORT || 3000, () => {
