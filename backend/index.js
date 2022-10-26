@@ -269,6 +269,16 @@ app.get('/tweets/', async (req, res) => {
 });
 
 
+
+app.get('/likedusers/', async (req, res) => {
+    console.log(req.body)
+    const sampleTweetId = req.body.sampleTweetId;
+    const number = req.body.limit;
+    console.log("GET users who liked tweet", sampleTweetId, number)
+    res.send(await getUsersWhoLikedTweet(sampleTweetId, number))
+});
+
+
 //You can specify the port in .env file
 app.listen(process.env.PORT || 3000, () => {
     console.log('Currently Listening to the Server')
