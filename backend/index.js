@@ -6,6 +6,9 @@ const needle = require("needle");
 const app = express()
 const bodyParser = require('body-parser');
 const cors = require('cors');
+const language = require('@google-cloud/language');
+
+const client = new language.LanguageServiceClient()
 
 
 dotenv.config();
@@ -278,10 +281,80 @@ app.get('/likedusers/', async (req, res) => {
     res.send(await getUsersWhoLikedTweet(sampleTweetId, number))
 });
 
+app.get('/entities/', async (req, res) => {
+    console.log(req.body)
+    const id = req.body.id;
+    console.log("GET tweets", id)
+    const tweets = await getUserTweets(id)
+
+    const tweetstr = tweets.map((tweet) => tweet.text).join(' ');
+
+    //console.log(tweetstr)
+
+    const document = {
+        content: tweetstr,
+        type: 'PLAIN_TEXT',
+    };
+
+    const [result] = await client.analyzeEntities({ document });
+
+    const entities = result.entities;
+
+    res.send(entities)
+    // console.log('Entities:');
+    // entities.forEach(entity => {
+    //     console.log(entity.name);
+    //     console.log(` - Type: ${entity.type}, Salience: ${entity.salience}`);
+    //     if (entity.metadata && entity.metadata.wikipedia_url) {
+    //         console.log(` - Wikipedia URL: ${entity.metadata.wikipedia_url}`);
+    //     }
+
+    // })
+});
+
 
 //You can specify the port in .env file
 app.listen(process.env.PORT || 3000, () => {
     console.log('Currently Listening to the Server')
 })
+
+
+async function quickstart() {
+    // Imports the Google Cloud client library
+    const language = require('@google-cloud/language');
+
+    // Instantiates a client
+    const client = new language.LanguageServiceClient();
+
+    // The text to analyze
+    const text = 'Hello, world!';
+
+    const document = {
+        content: text,
+        type: 'PLAIN_TEXT',
+    };
+
+    // Detects the sentiment of the text
+    const [result] = await client.analyzeSentiment({ document: document });
+    const sentiment = result.documentSentiment;
+
+    console.log(`Text: ${text}`);
+    console.log(`Sentiment score: ${sentiment.score}`);
+    console.log(`Sentiment magnitude: ${sentiment.magnitude}`);
+
+    const [result2] = await client.analyzeEntities({ document });
+
+    const entities = result2.entities;
+
+    console.log('Entities:');
+    entities.forEach(entity => {
+        console.log(entity.name);
+        console.log(` - Type: ${entity.type}, Salience: ${entity.salience}`);
+        if (entity.metadata && entity.metadata.wikipedia_url) {
+            console.log(` - Wikipedia URL: ${entity.metadata.wikipedia_url}`);
+        }
+
+    })
+}
 
 module.exports = app
