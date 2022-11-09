@@ -275,11 +275,45 @@ app.get('/tweets/', async (req, res) => {
 
 app.get('/likedusers/', async (req, res) => {
   console.log(req.body)
-  const sampleTweetId = req.body.sampleTweetId;
+  const tweetId = req.body.tweetId;
   const number = req.body.limit;
-  console.log("GET users who liked tweet", sampleTweetId, number)
-  res.send(await getUsersWhoLikedTweet(sampleTweetId, number))
+  console.log("GET users who liked tweet", tweetId, number)
+  res.send(await getUsersWhoLikedTweet(tweetId, number))
 });
+
+app.get('/getcategories/', async (req, res) => {
+    console.log(req.body)
+    const id = req.body.id;
+    console.log("GET tweets", id)
+    const tweets = await getUserTweets(id)
+
+    let result = []
+
+    
+    tweets.forEach((tweet) => {
+        if(tweet.text.length > 100) {
+            const document = {
+                content: tweet.text,
+                type: 'PLAIN_TEXT',
+            };
+            //console.log(tweet)
+            result.push(client.classifyText({ document }))
+        }
+    })
+
+    Promise.allSettled(result).then((resArr) => {
+        resArr = resArr
+                .filter((prms) => prms.status === "fulfilled")
+                .map((e) => e.value[0].categories)
+                .filter((e) => e.length !== 0)
+                .sort((a,b) => a.confidence - b.confidence)
+        console.log(resArr)
+        res.send(resArr)
+    })
+    //console.log(result)
+    result = result.map((res) => res[0])
+
+})
 
 app.get('/entities/', async (req, res) => {
     console.log(req.body)
