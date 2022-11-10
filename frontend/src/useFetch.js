@@ -16,9 +16,10 @@ function useFetch(endpoint) {
       setLoading(true)
       await fetch(URL + endpoint)
       .then(response=>{
+        console.log(response)
         if(response.ok){
-         response.json().then((i)=>
-         setData(i))
+          console.log(response.json())
+         response.json().then((i)=>setData(i))
         }
       })
       .catch(err =>{

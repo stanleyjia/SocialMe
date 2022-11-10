@@ -1,19 +1,19 @@
 import React, { useState, useEffect } from "react";
-import Searchbar from "./Searchbar";
 import NumberCard from "./NumberCard"
 
-import {Box, Button} from "@mui/material";
+import {Box, Button, TextField} from "@mui/material";
 import Typography from "@mui/material/Typography";
 import twitterLogo from '.././resources/twitter-logo.png'
+import useFetch from "../useFetch";
 
 
 
-function Home() {
-  const [userId, setUserId] = useState("");
+function Home(props) {
+  // const [input, setInput] = useState("");
+
 
   return (
     <Box
-      className="App"
       sx={{
         display: "flex",
         flexFlow: "column nowrap",
@@ -26,8 +26,13 @@ function Home() {
       <Typography variant="p" sx={{mt:1,mb:4}}>A tool to automatically generate a report on a target Twitter user</Typography>
 
       <Box sx={{display:"flex", flexDirection:"row", mb:2}}>
-        <Searchbar setUserId={setUserId} />
-        <Button size="medium" variant="contained" sx={{ml:1}}>Submit</Button>
+      <TextField
+      id="outlined-basic"
+      label="Enter Twitter @"
+      variant="outlined"
+      onChange={(e) => props.setUsername(e.target.value)}
+    />
+        <Button size="medium" variant="contained" sx={{ml:1}} onClick={props.handleSubmit}>Submit</Button>
       </Box>
     </Box>
   );
