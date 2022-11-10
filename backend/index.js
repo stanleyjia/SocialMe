@@ -244,7 +244,7 @@ app.post("/likedusers/", async (req, res) => {
   res.send(await getUsersWhoLikedTweet(tweetId, number));
 });
 
-app.post("/gethashtags/", async (req, res) => {
+app.post("/hashtags/", async (req, res) => {
   console.log(req.body);
   const id = req.body.id;
   console.log("GET tweets", id);
@@ -253,6 +253,10 @@ app.post("/gethashtags/", async (req, res) => {
   const tweetText = tweets.map((tweet) => tweet.text).join(' ');
   const hashMatch = tweetText.match(/(^|\B)#(?![0-9_]+\b)([a-zA-Z0-9_]{1,30})(\b|\r)/g);
 
+  if(!hashMatch || hashMatch.length === 0) {
+    res.send([])
+    return
+  }
   let seen = {}
   hashMatch.forEach((e) => {
     if (seen[e]) {
@@ -268,7 +272,7 @@ app.post("/gethashtags/", async (req, res) => {
 
 })
 
-app.post("/getcategories/", async (req, res) => {
+app.post("/categories/", async (req, res) => {
   console.log(req.body);
   const id = req.body.id;
   console.log("GET tweets", id);
@@ -301,6 +305,20 @@ app.post("/getcategories/", async (req, res) => {
       .filter((e) => e.length !== 0)
       .flat()
       .sort((a, b) => b.confidence - a.confidence);
+    let seenMap = new Map()
+
+    resArr.forEach((e) => {
+      if(seenMap.has(e.name)) {
+        seenMap.set(e.name, [...seenMap.get(e.name), e.tweets])
+      } else {
+        seenMap.set(e.name, e.tweets)
+      }
+    })
+
+    let sendArr = [];
+    for (const [k,v] of seenMap) {
+      sendArr.push({name: k, tweets: v.flat()})
+    }
     // let seen = {}
     // resArr = resArr.map((e, i) => {
     //   console.log(seen)
@@ -312,7 +330,7 @@ app.post("/getcategories/", async (req, res) => {
     //     return e
     //   }
     // })
-    res.send(resArr);
+    res.send(sendArr);
   });
 });
 

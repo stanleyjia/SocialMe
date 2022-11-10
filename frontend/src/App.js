@@ -14,6 +14,7 @@ function App() {
   const [username, setUsername] = useState("");
   const [loading, setLoading] = useState(false);
   const [resultsFound, setResultsFound] = useState(false)
+  const [results, setResults] = useState({})
 
 
   const handleSubmit = async () => {
@@ -22,19 +23,20 @@ function App() {
     const userId = await fetchData(`id/${username}`)
     await Promise.all([
       fetchData('tweets', {id: userId, limit:5}),
-      fetchData('getcategories', {id: userId}),
-      fetchData('entities', {id: userId})
+      fetchData('categories', {id: userId}),
+      fetchData('hashtags', {id: userId})
 
-
-    ]).then(([tweets, categories, entities]) => {
-      console.log(tweets, categories, entities)
+    ]).then((res) => {
+      const [tweets, categories, hashtags] = res
+      setResults({tweets, categories, hashtags})
+      console.log(tweets, categories, hashtags)
       setResultsFound(true)
     })
     setLoading(false)
   }
 
   if (resultsFound) {
-    return <Results />
+    return <Results results={results} />
   }
 
   return (
