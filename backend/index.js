@@ -73,6 +73,27 @@ const getUserTweets = async (userId, num = 100) => {
   else throw new Error("Unsuccessful Request");
 };
 
+const getTweet = async (id) => {
+  
+  const endpointUrl = `https://api.twitter.com/2/tweets/${id}`;
+ 
+  const response = await needle("get", endpointUrl, params, {
+    headers: {
+      "User-Agent": "v2RecentSearchJS",
+      authorization: `Bearer ${BearerToken}`,
+    },
+  });
+  if (response.statusCode !== 200) {
+    if (response.statusCode === 403) {
+      res.status(403).send(response.body);
+    } else {
+      throw new Error(response.body.error.message);
+    }
+  }
+  if (response.body) return response.body.data;
+  else throw new Error("Unsuccessful Request");
+};
+
 const getUserFollowers = async (userId, num) => {
   if (num > 1000) {
     throw new Error("Can load maximum of 100 followers in one pull");
@@ -250,6 +271,11 @@ app.post("/hashtags/", async (req, res) => {
   console.log("GET tweets", id);
   const tweets = await getUserTweets(id);
 
+  if(!tweets || tweets.length === 0 ) {
+    res.send([])
+    return
+  }
+
   const tweetText = tweets.map((tweet) => tweet.text).join(' ');
   const hashMatch = tweetText.match(/(^|\B)#(?![0-9_]+\b)([a-zA-Z0-9_]{1,30})(\b|\r)/g);
 
@@ -281,8 +307,13 @@ app.post("/categories/", async (req, res) => {
   let result = [];
   let tweetInd = [];
 
+  if(!tweets || tweets.length === 0) {
+    res.send([])
+    return
+  }
+
   tweets.forEach((tweet) => {
-    if (tweet.text.length > 80) {
+    if (tweet.text.length > 70) {
       const document = {
         content: tweet.text,
         type: "PLAIN_TEXT",
@@ -318,6 +349,12 @@ app.post("/categories/", async (req, res) => {
     let sendArr = [];
     for (const [k,v] of seenMap) {
       sendArr.push({name: k, tweets: v.flat()})
+    }
+
+    for (const categ of sendArr) {
+      for(const tweet of categ.tweets) {
+        
+      }
     }
     // let seen = {}
     // resArr = resArr.map((e, i) => {

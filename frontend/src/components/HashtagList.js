@@ -4,6 +4,7 @@ import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemText from "@mui/material/ListItemText";
 import Typography from "@mui/material/Typography";
+import Link from "@mui/material/Link";
 
 const HashTagList = ({ hashtags }) => {
   if (!hashtags || hashtags.length === 0) {
@@ -24,7 +25,13 @@ const HashTagList = ({ hashtags }) => {
       </Typography>
       {hashtags.map((e, i) => (
         <ListItem>
-          <ListItemText primary={`${i + 1}. ${e}`} />
+          <Link
+            href={`https://twitter.com/search?q=%23${e.substring(1)}`}
+            target="_blank"
+            rel="noopener"
+          >
+            <ListItemText primary={`${i + 1}. ${e}`} />
+          </Link>
         </ListItem>
       ))}
     </List>
