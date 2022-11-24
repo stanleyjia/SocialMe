@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import NumberCard from "./components/NumberCard"
 
-import {Box, Button} from "@mui/material";
+import { Box, Button } from "@mui/material";
 import Typography from "@mui/material/Typography";
 import twitterLogo from './resources/twitter-logo.png'
 import Home from "./components/Home";
@@ -19,16 +19,16 @@ function App() {
 
   const handleSubmit = async () => {
     setLoading(true)
-    console.log(username)
+    // console.log(username)
     const userId = await fetchData(`id/${username}`)
     await Promise.all([
-      fetchData('tweets', {id: userId, limit:5}),
-      fetchData('categories', {id: userId}),
-      fetchData('hashtags', {id: userId})
+      fetchData('tweets', { id: userId, limit: 5 }),
+      fetchData('categories', { id: userId }),
+      fetchData('hashtags', { id: userId })
 
     ]).then((res) => {
       const [tweets, categories, hashtags] = res
-      setResults({tweets, categories, hashtags})
+      setResults({ tweets, categories, hashtags })
       console.log(tweets, categories, hashtags)
       setResultsFound(true)
     })
@@ -41,8 +41,8 @@ function App() {
 
   return (
     loading ?
-    <Loading /> :
-    <Home setUsername={setUsername} handleSubmit={handleSubmit} />
+      <Loading /> :
+      <Home setUsername={setUsername} handleSubmit={handleSubmit} />
   );
 }
 
