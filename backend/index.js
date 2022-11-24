@@ -69,6 +69,11 @@ app.post("/hashtags/", async (req, res) => {
   console.log("GET hashtags", id);
   const tweets = await Twitter.getUserTweets(id);
 
+  if (!tweets || tweets.length === 0) {
+    res.send([])
+    return
+  }
+
   const tweetText = tweets.map((tweet) => tweet.text).join(' ');
   console.log(tweetText)
   const hashMatch = tweetText.match(/(^|\B)#(?![0-9_]+\b)([a-zA-Z0-9_]{1,30})(\b|\r)/g);
@@ -101,8 +106,13 @@ app.post("/categories/", async (req, res) => {
   let result = [];
   let tweetInd = [];
 
+  if (!tweets || tweets.length === 0) {
+    res.send([])
+    return
+  }
+
   tweets.forEach((tweet) => {
-    if (tweet.text.length > 80) {
+    if (tweet.text.length > 70) {
       const document = {
         content: tweet.text,
         type: "PLAIN_TEXT",
@@ -138,6 +148,12 @@ app.post("/categories/", async (req, res) => {
     let sendArr = [];
     for (const [k, v] of seenMap) {
       sendArr.push({ name: k, tweets: v.flat() })
+    }
+
+    for (const categ of sendArr) {
+      for (const tweet of categ.tweets) {
+
+      }
     }
     // let seen = {}
     // resArr = resArr.map((e, i) => {
