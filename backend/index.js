@@ -19,15 +19,20 @@ app.use(bodyParser.json());
 
 async function run() {
   const { id, name, username } = await Twitter.getUserData("elonMusk");
-  const tweets = await Twitter.getUserTweets(id, 5);
+  // console.log(id, name, username)
+  const tweets = await Twitter.getUserTweets(id, 1000);
   const followers = await Twitter.getUserFollowers(id, 5);
   const following = await Twitter.getUserFollowing(id, 5);
 
   const mentions = await Twitter.getUserMentions(id, 5);
   const likedTweets = await Twitter.getUserLikedTweets(id, 5);
 
+  // console.log(likedTweets)
   const sampleTweetId = likedTweets[0].id;
   const likedUsers = await Twitter.getUsersWhoLikedTweet(sampleTweetId, 5);
+  const mostInteractedWithUser = await Twitter.getMostInteractedUsers(tweets)
+  // const timeline = await Twitter.getTimeline(id)
+  // console.log('timeline', timeline)
 
   // console.log(id, name, username)
   // console.log(tweets)
@@ -63,6 +68,15 @@ app.post("/likedusers/", async (req, res) => {
   res.send(await Twitter.getUsersWhoLikedTweet(tweetId, number));
 });
 
+app.post("/getInteractedWithAccounts/", async (req, res) => {
+  // console.log(req.body);
+  const id = req.body.id;
+  // console.log("GET hashtags", id);
+  const tweets = await Twitter.getUserTweets(id, 1000);
+  const mostInteractedWith = Twitter.getMostInteractedUsers(tweets)
+  res.send(result)
+})
+
 app.post("/hashtags/", async (req, res) => {
   console.log(req.body);
   const id = req.body.id;
@@ -75,7 +89,7 @@ app.post("/hashtags/", async (req, res) => {
   }
 
   const tweetText = tweets.map((tweet) => tweet.text).join(' ');
-  console.log(tweetText)
+  // console.log(tweetText)
   const hashMatch = tweetText.match(/(^|\B)#(?![0-9_]+\b)([a-zA-Z0-9_]{1,30})(\b|\r)/g);
 
   if (!hashMatch || hashMatch.length === 0) {

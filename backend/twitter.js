@@ -1,21 +1,54 @@
+const e = require('express');
 const Request = require('./request.js')
 
 //Get Tweets from Twitter API
 exports.getUserData = async (username) => {
   const endpointUrl = `https://api.twitter.com/2/users/by/username/${username}`;
-  return await Request.get(endpointUrl)
+  const response = await Request.get(endpointUrl)
+  return response.data
 };
 
 //Get Tweets from Twitter API
 exports.getUserTweets = async (userId, num = 100) => {
-  if (num > 100) {
-    throw new Error("Can load maximum of 100 tweets in one pull");
-  }
   const endpointUrl = `https://api.twitter.com/2/users/${userId}/tweets`;
-  const params = {
-    max_results: num,
-  };
-  return await Request.get(endpointUrl, params)
+  let params;
+  if (num > 100) {
+    let i = 0
+    let data = [];
+    let next_token = null;
+    while (i < num) {
+      // console.log(i, next_token)
+      // console.log(data.length)
+      if ((num - i) < 100) {
+        params = {
+          max_results: (num + 10) - i,
+        }
+        if (next_token != null) params["pagination_token"] = next_token
+        i = num
+      } else {
+        params = {
+          max_results: 100
+        }
+        if (next_token != null) params["pagination_token"] = next_token
+        i += 100
+      }
+      const res = await Request.get(endpointUrl, params)
+      next_token = res.meta.next_token
+      data = data.concat(res.data)
+    }
+    // console.log('length', data.length)
+    return data
+
+
+    // console.log("RES", res.meta.next_token)
+
+  } else {
+    params = {
+      max_results: num,
+    };
+    const res = await Request.get(endpointUrl, params)
+    return res.data
+  }
 };
 
 exports.getUserFollowers = async (userId, num) => {
@@ -26,7 +59,8 @@ exports.getUserFollowers = async (userId, num) => {
   const params = {
     max_results: num,
   };
-  return await Request.get(endpointUrl, params)
+  const res = await Request.get(endpointUrl, params)
+  return res.data
 };
 
 exports.getUserFollowing = async (userId, num) => {
@@ -37,7 +71,8 @@ exports.getUserFollowing = async (userId, num) => {
   const params = {
     max_results: num,
   };
-  return await Request.get(endpointUrl, params)
+  const res = await Request.get(endpointUrl, params)
+  return res.data
 };
 
 exports.getUserMentions = async (userId, num) => {
@@ -48,7 +83,8 @@ exports.getUserMentions = async (userId, num) => {
   const params = {
     max_results: num,
   };
-  return await Request.get(endpointUrl, params)
+  const res = await Request.get(endpointUrl, params)
+  return res.data
 };
 
 exports.getUserLikedTweets = async (userId, num) => {
@@ -59,7 +95,8 @@ exports.getUserLikedTweets = async (userId, num) => {
   const params = {
     max_results: num,
   };
-  return await Request.get(endpointUrl, params)
+  const res = await Request.get(endpointUrl, params)
+  return res.data
 };
 
 exports.getUsersWhoLikedTweet = async (tweetId, num) => {
@@ -70,6 +107,48 @@ exports.getUsersWhoLikedTweet = async (tweetId, num) => {
   const params = {
     max_results: num,
   };
-  return await Request.get(endpointUrl, params)
+  const res = await Request.get(endpointUrl, params)
+  return res.data
 };
 
+exports.getTimeline = async (userId) => {
+  const endpointUrl = `https://api.twitter.com/1.1/statuses/user_timeline.json?user_id=${userId}`;
+  const params = {
+    user_id: userId
+  };
+  const res = await Request.get(endpointUrl, params)
+  return res.data
+}
+
+exports.getMostInteractedUsers = (tweets) => {
+  // tweets.forEach((tweet) => {
+
+  // })
+  const tweetText = tweets.map((tweet) => tweet.text).join(' ');
+  console.log(tweetText)
+  const mentionMatch = tweetText.match(/(^|\B)@(?![0-9_]+\b)([a-zA-Z0-9_]{1,30})(\b|\r)/g);
+
+  if (!mentionMatch || mentionMatch.length === 0) {
+    return []
+  }
+  let count = {}
+  mentionMatch.forEach((e) => {
+    if (count[e]) {
+      count[e]++
+    } else {
+      count[e] = 1
+    }
+  })
+
+  let result = [... new Set(mentionMatch)]
+  result.sort((a, b) => count[b] - count[a]);
+  // console.log(result, count)
+
+  let output = {}
+  result.slice(0, 10).forEach((id) => {
+    output[id] = count[id]
+  })
+  // console.log(output)
+  return output
+
+}

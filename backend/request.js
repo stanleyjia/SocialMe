@@ -15,9 +15,14 @@ async function get(url, params = {}) {
       },
     }
   );
-  if (response.body) return response.body.data;
-  else throw new Error("Unsuccessful Request"
-  );
+  if (response.body) {
+    // console.log(response.body.meta)
+    return response.body
+  }
+  else {
+    console.log(response.body.error)
+    throw new Error("Unsuccessful Request")
+  }
 }
 
 module.exports = { get: get }
