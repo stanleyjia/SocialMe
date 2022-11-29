@@ -1,6 +1,5 @@
-
 const express = require("express");
-const Twitter = require("./twitter.js")
+const Twitter = require("./twitter.js");
 
 const app = express();
 const bodyParser = require("body-parser");
@@ -9,18 +8,16 @@ const language = require("@google-cloud/language");
 
 const client = new language.LanguageServiceClient();
 
-
 app.use(cors());
 
 // Configuring body parser middleware
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
-
 async function run() {
   const { id, name, username } = await Twitter.getUserData("elonMusk");
   // console.log(id, name, username)
-  const tweets = await Twitter.getUserTweets(id, 1000);
+  const tweets = await Twitter.getUserTweets(id, 10);
   const followers = await Twitter.getUserFollowers(id, 5);
   const following = await Twitter.getUserFollowing(id, 5);
 
@@ -30,7 +27,8 @@ async function run() {
   // console.log(likedTweets)
   const sampleTweetId = likedTweets[0].id;
   const likedUsers = await Twitter.getUsersWhoLikedTweet(sampleTweetId, 5);
-  const mostInteractedWithUser = await Twitter.getMostInteractedUsers(tweets)
+  const mostInteractedWithUser = await Twitter.getMostInteractedUsers(tweets);
+  // const tweetInfo = await Twitter.getTweetById('1553190311450386433')
   // const timeline = await Twitter.getTimeline(id)
   // console.log('timeline', timeline)
 
@@ -40,9 +38,10 @@ async function run() {
   // console.log(mentions)
   // console.log(likedTweets)
   // console.log(likedUsers);
+  console.log(tweets)
 }
 
-run()
+// run()
 
 app.post("/id/:username", async (req, res) => {
   const username = req.params.username;
@@ -73,9 +72,9 @@ app.post("/getInteractedWithAccounts/", async (req, res) => {
   const id = req.body.id;
   // console.log("GET hashtags", id);
   const tweets = await Twitter.getUserTweets(id, 1000);
-  const mostInteractedWith = Twitter.getMostInteractedUsers(tweets)
-  res.send(result)
-})
+  const mostInteractedWith = Twitter.getMostInteractedUsers(tweets);
+  res.send(result);
+});
 
 app.post("/hashtags/", async (req, res) => {
   console.log(req.body);
@@ -84,32 +83,33 @@ app.post("/hashtags/", async (req, res) => {
   const tweets = await Twitter.getUserTweets(id);
 
   if (!tweets || tweets.length === 0) {
-    res.send([])
-    return
+    res.send([]);
+    return;
   }
 
-  const tweetText = tweets.map((tweet) => tweet.text).join(' ');
+  const tweetText = tweets.map((tweet) => tweet.text).join(" ");
   // console.log(tweetText)
-  const hashMatch = tweetText.match(/(^|\B)#(?![0-9_]+\b)([a-zA-Z0-9_]{1,30})(\b|\r)/g);
+  const hashMatch = tweetText.match(
+    /(^|\B)#(?![0-9_]+\b)([a-zA-Z0-9_]{1,30})(\b|\r)/g
+  );
 
   if (!hashMatch || hashMatch.length === 0) {
-    res.send([])
-    return
+    res.send([]);
+    return;
   }
-  let seen = {}
+  let seen = {};
   hashMatch.forEach((e) => {
     if (seen[e]) {
-      seen[e]++
+      seen[e]++;
     } else {
-      seen[e] = 1
+      seen[e] = 1;
     }
-  })
+  });
 
-  let result = [... new Set(hashMatch)]
+  let result = [...new Set(hashMatch)];
   result.sort((a, b) => seen[b] - seen[a]);
-  res.send(result)
-
-})
+  res.send(result);
+});
 
 app.post("/categories/", async (req, res) => {
   console.log(req.body);
@@ -121,8 +121,8 @@ app.post("/categories/", async (req, res) => {
   let tweetInd = [];
 
   if (!tweets || tweets.length === 0) {
-    res.send([])
-    return
+    res.send([]);
+    return;
   }
 
   tweets.forEach((tweet) => {
@@ -137,7 +137,7 @@ app.post("/categories/", async (req, res) => {
     }
   });
 
-  Promise.allSettled(result).then((resArr) => {
+  Promise.allSettled(result).then(async (resArr) => {
     resArr.forEach((e, i) => (e.tweet = tweetInd[i]));
     // console.log(resArr)
     resArr = resArr.filter((prms) => prms.status === "fulfilled");
@@ -149,24 +149,43 @@ app.post("/categories/", async (req, res) => {
       .filter((e) => e.length !== 0)
       .flat()
       .sort((a, b) => b.confidence - a.confidence);
-    let seenMap = new Map()
+    let seenMap = new Map();
 
     resArr.forEach((e) => {
       if (seenMap.has(e.name)) {
-        seenMap.set(e.name, [...seenMap.get(e.name), e.tweets])
+        seenMap.set(e.name, [...seenMap.get(e.name), e.tweets]);
       } else {
-        seenMap.set(e.name, e.tweets)
+        seenMap.set(e.name, e.tweets);
       }
-    })
+    });
 
     let sendArr = [];
     for (const [k, v] of seenMap) {
-      sendArr.push({ name: k, tweets: v.flat() })
+      sendArr.push({ name: k, tweets: v.flat() });
     }
 
     for (const categ of sendArr) {
       for (const tweet of categ.tweets) {
+        const document = {
+          content: tweet.text,
+          type: "PLAIN_TEXT",
+        };
 
+        const [result] =  await client.analyzeSentiment({ document: document })
+        const sentiment = result.documentSentiment;
+        tweet.sentiment = sentiment;
+        console.log(await Twitter.getTweetById(tweet.id))
+
+        // client.analyzeSentiment({ document: document }).then((res) => {
+        //   const [result] = res;
+        //   const sentiment = result.documentSentiment;
+        //   tweet.sentiment = sentiment;
+        //   Twitter.getTweetById(tweet.id)
+        //   .then((res) => {
+        //     console.log(tweet)
+        //     console.log(res)
+        //   })
+        // });
       }
     }
     // let seen = {}
@@ -180,7 +199,8 @@ app.post("/categories/", async (req, res) => {
     //     return e
     //   }
     // })
-    res.send(sendArr);
+    
+    res.send(sendArr)
   });
 });
 

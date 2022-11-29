@@ -11,7 +11,9 @@ exports.getUserData = async (username) => {
 //Get Tweets from Twitter API
 exports.getUserTweets = async (userId, num = 100) => {
   const endpointUrl = `https://api.twitter.com/2/users/${userId}/tweets`;
-  let params;
+  let params = {
+    'tweet.fields': 'public_metrics,text,id'
+  }
   if (num > 100) {
     let i = 0
     let data = [];
@@ -44,6 +46,7 @@ exports.getUserTweets = async (userId, num = 100) => {
 
   } else {
     params = {
+      'tweet.fields': 'public_metrics,text,id',
       max_results: num,
     };
     const res = await Request.get(endpointUrl, params)
@@ -125,7 +128,6 @@ exports.getMostInteractedUsers = (tweets) => {
 
   // })
   const tweetText = tweets.map((tweet) => tweet.text).join(' ');
-  console.log(tweetText)
   const mentionMatch = tweetText.match(/(^|\B)@(?![0-9_]+\b)([a-zA-Z0-9_]{1,30})(\b|\r)/g);
 
   if (!mentionMatch || mentionMatch.length === 0) {
@@ -152,3 +154,12 @@ exports.getMostInteractedUsers = (tweets) => {
   return output
 
 }
+
+exports.getTweetById = async (tweetId) => {
+ 
+  const endpointUrl = `https://api.twitter.com/2/tweets/${tweetId}?tweet.fields=public_metrics`;
+  const params = {
+  };
+  const res = await Request.get(endpointUrl, params)
+  return res.data
+};
