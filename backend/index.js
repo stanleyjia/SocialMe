@@ -73,8 +73,10 @@ app.post("/getInteractedWithAccounts/", async (req, res) => {
   // console.log("GET hashtags", id);
   const tweets = await Twitter.getUserTweets(id, 1000);
   const mostInteractedWith = Twitter.getMostInteractedUsers(tweets);
-  res.send(result);
+  console.log(mostInteractedWith)
+  res.send(mostInteractedWith);
 });
+
 
 app.post("/hashtags/", async (req, res) => {
   console.log(req.body);

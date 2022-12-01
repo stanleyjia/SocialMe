@@ -6,7 +6,7 @@ import Typography from "@mui/material/Typography";
 import twitterLogo from '.././resources/twitter-logo.png'
 import InterestList from './InterestList'
 import HashTagList from "./HashtagList";
-
+import InteractedList from "./InteractedList";
 
 
 function Results({ results }) {
@@ -29,6 +29,7 @@ function Results({ results }) {
       <Box sx={{ display: "flex", flexDirection: "row", width: "1000", mb: 2 }}>
         <InterestList interests={results.categories} />
         <HashTagList hashtags={results.hashtags} />
+        {/* <InteractedList interacted={results.interacted ? results.interacted.keys() : []} /> */}
       </Box>
     </Box>
   );
