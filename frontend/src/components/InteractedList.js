@@ -21,7 +21,7 @@ const InteractedList = ({ interacted }) => {
       aria-labelledby="nested-list-subheader"
     >
       <Typography sx={{ mt: 4, mb: 2 }} variant="h6" component="div">
-        Top interacted
+        Top Interacted with Users
       </Typography>
       {interacted.map((e, i) => (
         <ListItem>

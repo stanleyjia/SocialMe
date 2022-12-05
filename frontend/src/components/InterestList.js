@@ -62,7 +62,7 @@ const InterestList = ({ interests }) => {
       aria-labelledby="nested-list-subheader"
     >
       <Typography sx={{ mt: 4, mb: 2 }} variant="h6" component="div">
-        Interests
+        User's Main Interests
       </Typography>
       {interests.map((e, i) => (
         <>
