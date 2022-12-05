@@ -25,12 +25,12 @@ function App() {
       fetchData('tweets', { id: userId, limit: 5 }),
       fetchData('categories', { id: userId }),
       fetchData('hashtags', { id: userId }),
-      fetchData('getInteractedWithAccounts', {id: userId})
+      fetchData('getInteractedWithAccounts', { id: userId })
 
     ]).then((res) => {
       const [tweets, categories, hashtags, interacted] = res
       setResults({ tweets, categories, hashtags, interacted })
-      console.log(tweets, categories, hashtags)
+      console.log(tweets, categories, hashtags, interacted)
       setResultsFound(true)
     })
     setLoading(false)

@@ -8,6 +8,8 @@ const language = require("@google-cloud/language");
 
 const client = new language.LanguageServiceClient();
 
+// console.log(client)
+
 app.use(cors());
 
 // Configuring body parser middleware
@@ -70,10 +72,9 @@ app.post("/likedusers/", async (req, res) => {
 app.post("/getInteractedWithAccounts/", async (req, res) => {
   // console.log(req.body);
   const id = req.body.id;
-  // console.log("GET hashtags", id);
   const tweets = await Twitter.getUserTweets(id, 1000);
   const mostInteractedWith = Twitter.getMostInteractedUsers(tweets);
-  console.log(mostInteractedWith)
+  console.log("most interacted with", mostInteractedWith)
   res.send(mostInteractedWith);
 });
 
@@ -82,7 +83,7 @@ app.post("/hashtags/", async (req, res) => {
   console.log(req.body);
   const id = req.body.id;
   console.log("GET hashtags", id);
-  const tweets = await Twitter.getUserTweets(id);
+  const tweets = await Twitter.getUserTweets(id, 1000);
 
   if (!tweets || tweets.length === 0) {
     res.send([]);
@@ -94,6 +95,8 @@ app.post("/hashtags/", async (req, res) => {
   const hashMatch = tweetText.match(
     /(^|\B)#(?![0-9_]+\b)([a-zA-Z0-9_]{1,30})(\b|\r)/g
   );
+
+  // console.log(hashMatch)
 
   if (!hashMatch || hashMatch.length === 0) {
     res.send([]);
@@ -173,10 +176,10 @@ app.post("/categories/", async (req, res) => {
           type: "PLAIN_TEXT",
         };
 
-        const [result] =  await client.analyzeSentiment({ document: document })
+        const [result] = await client.analyzeSentiment({ document: document })
         const sentiment = result.documentSentiment;
         tweet.sentiment = sentiment;
-        console.log(await Twitter.getTweetById(tweet.id))
+        // console.log(await Twitter.getTweetById(tweet.id))
 
         // client.analyzeSentiment({ document: document }).then((res) => {
         //   const [result] = res;
@@ -201,7 +204,7 @@ app.post("/categories/", async (req, res) => {
     //     return e
     //   }
     // })
-    
+
     res.send(sendArr)
   });
 });
@@ -241,6 +244,7 @@ app.post("/entities/", async (req, res) => {
 app.listen(process.env.PORT || 3000, () => {
   console.log("Currently Listening to the Server");
 });
+// quickstart()
 
 async function quickstart() {
   // Imports the Google Cloud client library

@@ -29,7 +29,7 @@ function Results({ results }) {
       <Box sx={{ display: "flex", flexDirection: "row", width: "1000", mb: 2 }}>
         <InterestList interests={results.categories} />
         <HashTagList hashtags={results.hashtags} />
-        {/* <InteractedList interacted={results.interacted ? results.interacted.keys() : []} /> */}
+        <InteractedList interacted={results.interacted ? Object.keys(results.interacted) : []} />
       </Box>
     </Box>
   );
