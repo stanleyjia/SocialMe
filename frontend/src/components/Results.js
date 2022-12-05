@@ -31,7 +31,9 @@ function Results({ results }) {
         <HashTagList hashtags={results.hashtags} />
         <InteractedList interacted={results.interacted ? Object.keys(results.interacted) : []} />
       </Box>
+      <Button onClick="window.location.reload();">Refresh Page</Button>
     </Box>
+    
   );
 }
 
