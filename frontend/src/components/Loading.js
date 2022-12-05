@@ -15,7 +15,7 @@ function Loading(props) {
       }}
     >
       <Typography variant="h4" sx={{ my: 1, fontWeight: "500" }}>
-        Processing Twitter Account...
+        Generating Report...
       </Typography>
 
       <CircularProgress size={"5rem"} />

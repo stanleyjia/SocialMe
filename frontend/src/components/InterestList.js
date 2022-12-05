@@ -57,7 +57,7 @@ const InterestList = ({ interests }) => {
 
   return (
     <List
-      sx={{ width: "700px", bgcolor: "background.paper" }}
+      sx={{ width: "500px", bgcolor: "background.paper" }}
       component="nav"
       aria-labelledby="nested-list-subheader"
     >

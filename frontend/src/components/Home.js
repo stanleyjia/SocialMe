@@ -23,12 +23,12 @@ function Home(props) {
     >
       <img style={{width:"50px", height:"50px"}} alt="logo" src={twitterLogo} />
       <Typography variant="h2" sx={{my:1, fontWeight:"500"}}>Me-Tweet</Typography>
-      <Typography variant="p" sx={{mt:1,mb:4}}>A tool to automatically generate a report on a target Twitter user</Typography>
+      <Typography variant="p" sx={{mt:1,mb:4}}>Learn more about a Twitter user though an automatically generated report</Typography>
 
       <Box sx={{display:"flex", flexDirection:"row", mb:2}}>
       <TextField
       id="outlined-basic"
-      label="Enter Twitter @"
+      label="Please Enter Twitter @"
       variant="outlined"
       onChange={(e) => props.setUsername(e.target.value)}
     />
